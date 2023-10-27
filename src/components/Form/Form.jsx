@@ -1,60 +1,61 @@
-import { Component } from "react";
-import { FormStyle } from "./Form.styled";
+import React, { useState } from 'react';
+import { FormStyle } from './Form.styled';
 
-export class Form extends Component {
-    state = {
-        name: '',
-        number: ''
-    };
+const Form = ({ onChange }) => {
+  const [name, setName] = useState('');
+  const [number, setNumber] = useState('');
 
-    handleChange = event => {
-        const {name, value} = event.currentTarget
-        this.setState({[name]: value});
-    };
+  const handleChange = (event) => {
+    const { name, value } = event.currentTarget;
+    name === 'name' ? setName(value) : setNumber(value);
+  };
 
-    handleSubmit = event => {
-        event.preventDefault();
-        this.props.onChange(this.state);
-        this.formReset();
-    };
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    onChange({ name, number });
+    formReset();
+  };
 
-    formReset = () => {
-        this.setState({name: '', number: ''})
-    };
+  const formReset = () => {
+    setName('');
+    setNumber('');
+  };
 
-    render(){
-        const {name, number} = this.state;
-        return(
-            <FormStyle onSubmit={this.handleSubmit}>
-                <label className='label' htmlFor='name'>
-                    <span className="input-title">Name</span>
-                    <input className="input"
-                    type="text"
-                    name="name"
-                    required
-                    value={name}
-                    onChange={this.handleChange}
-                    pattern="^[a-zA-Zа-яА-Я]+(([' \-][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-                    />
-                </label>
-                <label htmlFor='number'>
-                    <span className="input-title">Number</span>
-                    <input className="input"
-                        type="tel"
-                        name="number"
-                        required
-                        value={number}
-                        onChange={this.handleChange}
-                        pattern="\+?\d{1,4}?[ .\-\s]?\(?\d{1,3}?\)?[ .\-\s]?\d{1,4}[ .\-\s]?\d{1,4}[ .\-\s]?\d{1,9}"
-                        />
-                </label>
-                <button 
-                    className="btn btn-primary btn-block btn-large" 
-                    type='submit'
-                    disabled={name === '' && number === ''}
-                    >Add Contact
-                </button>
-            </FormStyle> 
-        )
-    }
+  return (
+    <FormStyle onSubmit={handleSubmit}>
+      <label className="label" htmlFor="name">
+        <span className="input-title">Name</span>
+        <input
+          className="input"
+          type="text"
+          name="name"
+          required
+          value={name}
+          onChange={handleChange}
+          pattern="^[a-zA-Zа-яА-Я]+(([' \-][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
+        />
+      </label>
+      <label htmlFor="number">
+        <span className="input-title">Number</span>
+        <input
+          className="input"
+          type="tel"
+          name="number"
+          required
+          value={number}
+          onChange={handleChange}
+          pattern="\+?\d{1,4}?[ .\-\s]?\(?\d{1,3}?\)?[ .\-\s]?\d{1,4}[ .\-\s]?\d{1,4}[ .\-\s]?\d{1,9}"
+        />
+      </label>
+      <button
+        className="btn btn-primary btn-block btn-large"
+        type="submit"
+        disabled={name === '' && number === ''}
+      >
+        Add Contact
+      </button>
+    </FormStyle>
+  );
 };
+
+export default Form;
