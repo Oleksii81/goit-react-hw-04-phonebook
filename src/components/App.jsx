@@ -9,7 +9,8 @@ import { Contacts } from './Contacts/Contacts';
 import { NotificationFilter } from './NotificationFilter/NotificationFilter';
 
 export const App = () => {
-  const [contacts, setContacts] = useState([
+  const [contacts, setContacts] = useState(
+    JSON.parse(localStorage.getItem('contacts')) ?? [
     { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
     { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
     { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
@@ -17,19 +18,18 @@ export const App = () => {
   ]);
   const [filter, setFilter] = useState('');
 
-  useEffect(() => {
-    const savedContact = localStorage.getItem('contacts');
-    if (savedContact) {
-      setContacts(JSON.parse(savedContact));
-    }
-  }, []);
-
-  useEffect(() => {
+    useEffect(() => {
     localStorage.setItem('contacts', JSON.stringify(contacts));
   }, [contacts]);
 
   const onFormSubmitData = ({ name, number }) => {
-    if (contacts.some(contact => contact.name.toLowerCase() === name.toLowerCase())) {
+    if (
+      contacts.some(
+        (contact) =>
+          contact.name.toLowerCase() === name.toLowerCase() ||
+          contact.number === number
+      )
+    ) {
       alert(`${name} or entered number is already in contacts.`);
       return;
     }
@@ -40,7 +40,7 @@ export const App = () => {
       number,
     };
 
-    setContacts([newContact, ...contacts]);
+    setContacts(prevContacts => [newContact, ...prevContacts]);
   };
 
   const filteredContacts = () => {
@@ -54,7 +54,8 @@ export const App = () => {
   };
 
   const deleteContact = (contactId) => {
-    setContacts(contacts.filter((contact) => contact.id !== contactId));
+    setContacts(prevContacts =>
+      prevContacts.filter((contact) => contact.id !== contactId));
   };
 
   const onLengthCheck = () => {
@@ -70,18 +71,15 @@ export const App = () => {
         <Filter filter={filter} onFilterChange={onFilterChange} />
       </Containers>
       <Containers title={'Contacts'}>
-        {onLengthCheck() === 0 ? (
-          <Notification message="There are no contacts in your list, sorry" />
-        ) : (
-          <>
-            {filteredContacts().length > 0 ? (
-              <Contacts contacts={filteredContacts()} deleteContact={deleteContact} />
-            ) : (
-              <NotificationFilter notification="No contacts found that match the filter" />
-            )}
-          </>
+        {onLengthCheck() === 0 && <Notification message="There are no contacts in your list, sorry" />}
+        {onLengthCheck() > 0 && filteredContacts().length > 0 && (
+        <Contacts contacts={filteredContacts()} deleteContact={deleteContact} />
+        )}
+        {onLengthCheck() > 0 && filteredContacts().length === 0 && (
+        <NotificationFilter notification="No contacts found that match the filter" />
         )}
       </Containers>
+
     </Section>
   );
 };
